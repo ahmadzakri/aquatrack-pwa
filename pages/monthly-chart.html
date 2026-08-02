@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AquaTrack — Statistik Bulanan</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <main class="screen">
+    <h1 data-en="Monthly Statistics">Statistik Bulanan</h1>
+    <div class="row" style="gap:var(--space-2); margin-bottom:var(--space-3);">
+      <a href="weekly-chart.html" class="chip" data-en="Week" style="text-decoration:none; color:inherit;">Minggu</a>
+      <a href="monthly-chart.html" class="chip selected" data-en="Month" style="text-decoration:none; color:inherit;">Bulan</a>
+    </div>
+
+    <div class="card">
+      <canvas id="monthlyCanvas" height="220"></canvas>
+    </div>
+
+    <nav class="tab-bar">
+      <a href="dashboard.html"><span class="icon">🏠</span><span data-en="Dashboard">Dashboard</span></a>
+      <a href="drink-history.html"><span class="icon">📋</span><span data-en="History">Sejarah</span></a>
+      <a href="weekly-chart.html" class="active"><span class="icon">📊</span><span data-en="Stats">Statistik</span></a>
+      <a href="achievements.html"><span class="icon">🏆</span><span data-en="Badges">Lencana</span></a>
+      <a href="settings.html"><span class="icon">⚙️</span><span data-en="Settings">Tetapan</span></a>
+    </nav>
+  </main>
+
+  <script src="https://unpkg.com/dexie@4/dist/dexie.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="../js/db.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    async function loadMonthlyChart() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      const allLogs = await db.drinkLogs.toArray();
+      const dailyTotalsByDate = {};
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        dailyTotalsByDate[d] = 0;
+      }
+
+      allLogs.forEach((log) => {
+        const date = new Date(log.timestamp);
+        if (date.getFullYear() === year && date.getMonth() === month) {
+          dailyTotalsByDate[date.getDate()] += log.amountML;
+        }
+      });
+
+      renderMonthlyChart("monthlyCanvas", dailyTotalsByDate);
+    }
+
+    loadMonthlyChart();
+  </script>
+  <script src="../js/i18n.js"></script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AquaTrack — Sasaran Harian</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <main class="screen" style="justify-content:center; text-align:center;">
+    <p style="font-size:0.8rem;" data-en="Step 3 of 3">Langkah 3 dari 3</p>
+    <div class="float-hero" style="font-size:3rem;">🎯</div>
+    <h1 data-en="Your Daily Target">Sasaran Harian Kau</h1>
+    <div class="card" style="margin:var(--space-4) 0;">
+      <p style="margin:0; font-size:0.9rem;" data-en="Based on your weight & activity level">Berdasarkan berat badan &amp; tahap aktiviti</p>
+      <p id="goal-display" style="font-family:var(--font-display); font-size:2.5rem; font-weight:700; color:var(--color-primary); margin:var(--space-2) 0;">
+        — ml
+      </p>
+    </div>
+    <p data-en="You can change this target anytime in Settings.">Kau boleh ubah sasaran ni bila-bila masa dalam Tetapan.</p>
+    <a href="reminder-schedule.html" class="btn" data-en="Next: Set Reminder" style="text-decoration:none; margin-top:var(--space-4);">Seterusnya: Set Reminder</a>
+  </main>
+
+  <script src="https://unpkg.com/dexie@4/dist/dexie.js"></script>
+  <script src="../js/db.js"></script>
+  <script>
+    (async function () {
+      const userId = Number(localStorage.getItem("aquatrack_loggedInUserId"));
+      const profile = await db.userProfile.get(userId);
+      document.getElementById("goal-display").textContent = `${profile.dailyGoalML}ml`;
+    })();
+  </script>
+  <script src="../js/i18n.js"></script>
+</body>
+</html>

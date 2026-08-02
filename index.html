@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AquaTrack</title>
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#34E4C2" />
+  <link rel="stylesheet" href="./css/styles.css" />
+</head>
+<body>
+  <main class="screen" style="align-items:center; justify-content:center; text-align:center;">
+    <h1><span class="float-hero">💧</span> AquaTrack</h1>
+    <p data-en="Stay hydrated every day" style="color:var(--color-text-muted);">Kekal hidrasi setiap hari</p>
+  </main>
+
+  <script src="https://unpkg.com/dexie@4/dist/dexie.js"></script>
+  <script src="./js/db.js"></script>
+  <script src="./js/notifications.js"></script>
+  <script src="./js/app.js"></script>
+  <script>
+    // Splash screen: after a short delay, route based on app state —
+    // this is what makes the URL a real single-entry-point app instead
+    // of needing every screen opened manually.
+    setTimeout(async () => {
+      const loggedInUserId = Number(localStorage.getItem("aquatrack_loggedInUserId"));
+
+      if (loggedInUserId) {
+        const profile = await db.userProfile.get(loggedInUserId);
+        if (profile && profile.dailyGoalML) {
+          // Fully set up and logged in — go straight to the dashboard.
+          window.location.href = "./pages/dashboard.html";
+          return;
+        }
+        if (profile) {
+          // Logged in but never finished Profile Setup / Goal Calculator.
+          window.location.href = "./pages/profile-setup.html";
+          return;
+        }
+      }
+
+      // Not logged in yet — start the onboarding flow.
+      window.location.href = "./pages/onboarding-1.html";
+    }, 1200);
+  </script>
+  <script src="./js/i18n.js"></script>
+</body>
+</html>

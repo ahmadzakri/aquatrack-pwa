@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AquaTrack — Health Sync</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <main class="screen">
+    <a href="settings.html" class="top-link" data-en="&larr; Back">&larr; Kembali</a>
+    <h1 style="margin-top:var(--space-3);" data-en="Health Sync">Health Sync</h1>
+    <p data-en="Connect AquaTrack with other health apps on your phone.">Sambungkan AquaTrack dengan app kesihatan lain di telefon kau.</p>
+
+    <div class="card row" style="justify-content:space-between; align-items:center; margin-top:var(--space-3);">
+      <div>
+        <strong data-en="Google Fit">Google Fit</strong>
+        <p style="margin:2px 0 0;" data-en="Sync hydration data to Google Fit">Sync data hidrasi ke Google Fit</p>
+      </div>
+      <button class="btn" id="google-fit-btn" onclick="connectGoogleFit()" data-en="Connect">Sambung</button>
+    </div>
+
+    <div class="card row" style="justify-content:space-between; align-items:center; margin-top:var(--space-3); opacity:0.7;">
+      <div>
+        <strong data-en="Apple Health">Apple Health</strong>
+        <p style="margin:2px 0 0;">Available in future native version</p>
+      </div>
+      <button class="btn btn-secondary" disabled data-en="Not Available Yet">Belum Tersedia</button>
+    </div>
+
+    <div class="mock-disclosure" style="margin-top:var(--space-4);" data-en="ℹ️ Apple HealthKit can only be accessed from a native iOS app (Swift) — not web/PWA. This is an official Apple limitation, not a bug. Planned as a future enhancement if the app is rebuilt with Flutter/React Native.">
+      ℹ️ Apple HealthKit hanya boleh diakses dari native iOS app (Swift) — bukan web/PWA. Ini limitation rasmi Apple, bukan bug. Dirancang sebagai future enhancement jika app dibina semula guna Flutter/React Native.
+    </div>
+
+    <nav class="tab-bar">
+      <a href="dashboard.html"><span class="icon">🏠</span><span data-en="Dashboard">Dashboard</span></a>
+      <a href="drink-history.html"><span class="icon">📋</span><span data-en="History">Sejarah</span></a>
+      <a href="weekly-chart.html"><span class="icon">📊</span><span data-en="Stats">Statistik</span></a>
+      <a href="achievements.html"><span class="icon">🏆</span><span data-en="Badges">Lencana</span></a>
+      <a href="settings.html" class="active"><span class="icon">⚙️</span><span data-en="Settings">Tetapan</span></a>
+    </nav>
+  </main>
+
+  <script src="../js/googlefit.js"></script>
+  <script>
+    function connectGoogleFit() {
+      // Requires a real Google Cloud Console OAuth Client ID to actually work.
+      // See js/googlefit.js for setup steps.
+      alert("Google Fit OAuth belum di-setup lagi. Sila isi GOOGLE_CLIENT_ID dalam js/googlefit.js selepas buat Google Cloud Console project.");
+    }
+  </script>
+  <script src="../js/i18n.js"></script>
+</body>
+</html>

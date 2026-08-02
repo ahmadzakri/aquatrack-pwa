@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AquaTrack — Leaderboard</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <main class="screen">
+    <a href="achievements.html" class="top-link" data-en="&larr; Back">&larr; Kembali</a>
+    <h1 style="margin-top:var(--space-3);" data-en="Leaderboard">Leaderboard</h1>
+
+    <div class="mock-disclosure" data-en="ℹ️ Simulated data for demo purposes — not real users. A real multi-user leaderboard requires a server (Firebase), which is outside this project's scope.">
+      ℹ️ Data simulasi untuk demo — bukan pengguna sebenar. Leaderboard sebenar antara pengguna memerlukan server (Firebase), di luar skop projek ini.
+    </div>
+
+    <div id="leaderboard-list" class="stack" style="margin-top:var(--space-3); gap:0;"></div>
+
+    <nav class="tab-bar">
+      <a href="dashboard.html"><span class="icon">🏠</span><span data-en="Dashboard">Dashboard</span></a>
+      <a href="drink-history.html"><span class="icon">📋</span><span data-en="History">Sejarah</span></a>
+      <a href="weekly-chart.html"><span class="icon">📊</span><span data-en="Stats">Statistik</span></a>
+      <a href="achievements.html" class="active"><span class="icon">🏆</span><span data-en="Badges">Lencana</span></a>
+      <a href="settings.html"><span class="icon">⚙️</span><span data-en="Settings">Tetapan</span></a>
+    </nav>
+  </main>
+
+  <script src="https://unpkg.com/dexie@4/dist/dexie.js"></script>
+  <script src="../js/db.js"></script>
+  <script>
+    const MOCK_USERS = [
+      { userName: "Amir", avatarEmoji: "🧑", dailyIntakeML: 3100, streakDays: 12 },
+      { userName: "Farah", avatarEmoji: "👩", dailyIntakeML: 2850, streakDays: 9 },
+      { userName: "Ben", avatarEmoji: "🧑‍🦱", dailyIntakeML: 2400, streakDays: 5 },
+      { userName: "Nadia", avatarEmoji: "👧", dailyIntakeML: 2100, streakDays: 3 }
+    ];
+
+    async function loadLeaderboard() {
+      const userId = Number(localStorage.getItem("aquatrack_loggedInUserId"));
+      const profile = await db.userProfile.get(userId);
+      const todayLogs = await getTodayLogs();
+      const myTotal = todayLogs.reduce((sum, l) => sum + l.amountML, 0);
+      const lang = localStorage.getItem("aquatrack_lang") || "ms";
+      const meFallbackName = lang === "en" ? "You" : "Kau";
+      const meSuffix = lang === "en" ? " (You)" : " (Kau)";
+
+      const combined = [
+        ...MOCK_USERS,
+        { userName: profile?.name || meFallbackName, avatarEmoji: "⭐", dailyIntakeML: myTotal, streakDays: null, isMe: true }
+      ].sort((a, b) => b.dailyIntakeML - a.dailyIntakeML);
+
+      const listEl = document.getElementById("leaderboard-list");
+      listEl.innerHTML = combined
+        .map(
+          (u, i) => `
+          <div class="leaderboard-row ${u.isMe ? "me" : ""}">
+            <span style="width:24px; text-align:center;">${i + 1}</span>
+            <span style="font-size:1.4rem;">${u.avatarEmoji}</span>
+            <span style="flex:1;">${u.userName}${u.isMe ? meSuffix : ""}</span>
+            <strong>${u.dailyIntakeML}ml</strong>
+          </div>`
+        )
+        .join("");
+    }
+
+    loadLeaderboard();
+  </script>
+  <script src="../js/i18n.js"></script>
+</body>
+</html>

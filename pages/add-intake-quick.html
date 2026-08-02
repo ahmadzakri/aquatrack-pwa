@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AquaTrack — Tambah Air</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <main class="screen">
+    <a href="dashboard.html" class="top-link" data-en="&larr; Back">&larr; Kembali</a>
+    <h1 style="margin-top:var(--space-3);" data-en="How Much?">Berapa Banyak?</h1>
+    <p data-en="Pick a standard cup size, or enter your own amount.">Pilih saiz cawan standard, atau masukkan jumlah sendiri.</p>
+
+    <div class="stack" style="margin-top:var(--space-4);">
+      <div class="row">
+        <button class="chip" onclick="quickAdd(150)">🥤<br />150ml</button>
+        <button class="chip" onclick="quickAdd(250)">🥛<br />250ml</button>
+      </div>
+      <div class="row">
+        <button class="chip" onclick="quickAdd(500)">🍶<br />500ml</button>
+        <button class="chip" onclick="quickAdd(750)">💧<br />750ml</button>
+      </div>
+    </div>
+
+    <a href="add-intake-custom.html" class="btn btn-secondary" data-en="Enter Custom Amount" style="text-decoration:none; text-align:center; margin-top:var(--space-4);">
+      Masukkan Jumlah Sendiri
+    </a>
+
+    <p id="confirm-msg" style="color:var(--color-success); text-align:center; display:none; margin-top:var(--space-3);" data-en="Successfully added! Returning to Dashboard...">
+      Berjaya ditambah! Kembali ke Dashboard...
+    </p>
+  </main>
+
+  <script src="https://unpkg.com/dexie@4/dist/dexie.js"></script>
+  <script src="../js/db.js"></script>
+  <script>
+    async function quickAdd(amountML) {
+      await addDrinkLog(amountML);
+      document.getElementById("confirm-msg").style.display = "block";
+      setTimeout(() => {
+        window.location.href = "dashboard.html";
+      }, 900);
+    }
+  </script>
+  <script src="../js/i18n.js"></script>
+</body>
+</html>

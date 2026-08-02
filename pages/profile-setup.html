@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AquaTrack — Profil</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <main class="screen">
+    <p style="font-size:0.8rem;" data-en="Step 1 of 3">Langkah 1 dari 3</p>
+    <h1 data-en="A Bit About You">Sikit Tentang Kau</h1>
+    <p data-en="This helps us calculate your exact daily water target.">Ni membantu kami kira sasaran air harian yang tepat untuk kau.</p>
+
+    <form class="stack" style="margin-top:var(--space-4);" onsubmit="return saveAndContinue(event)">
+      <div class="field">
+        <label for="age" data-en="Age">Umur</label>
+        <input type="number" id="age" required min="10" max="100" placeholder="cth: 21" />
+      </div>
+      <div class="field">
+        <label for="gender" data-en="Gender">Jantina</label>
+        <select id="gender" required>
+          <option value="" data-en="Select...">Pilih...</option>
+          <option value="lelaki" data-en="Male">Lelaki</option>
+          <option value="perempuan" data-en="Female">Perempuan</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="weight" data-en="Weight (kg)">Berat Badan (kg)</label>
+        <input type="number" id="weight" required min="20" max="250" placeholder="cth: 60" />
+      </div>
+      <button type="submit" class="btn" data-en="Next">Seterusnya</button>
+    </form>
+  </main>
+
+  <script src="https://unpkg.com/dexie@4/dist/dexie.js"></script>
+  <script src="../js/db.js"></script>
+  <script>
+    async function saveAndContinue(event) {
+      event.preventDefault();
+      const age = Number(document.getElementById("age").value);
+      const gender = document.getElementById("gender").value;
+      const weightKg = Number(document.getElementById("weight").value);
+
+      const userId = Number(localStorage.getItem("aquatrack_loggedInUserId"));
+      await db.userProfile.update(userId, { age, gender, weightKg });
+
+      window.location.href = "activity-level.html";
+      return false;
+    }
+  </script>
+  <script src="../js/i18n.js"></script>
+</body>
+</html>

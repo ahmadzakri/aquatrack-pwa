@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AquaTrack — Tentang &amp; Bantuan</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <main class="screen">
+    <a href="settings.html" class="top-link" data-en="&larr; Back">&larr; Kembali</a>
+    <h1 style="margin-top:var(--space-3);" data-en="About AquaTrack">Tentang AquaTrack</h1>
+    <p data-en="Version 1.0.0 — University Project">Versi 1.0.0 — Projek Universiti</p>
+
+    <div class="card" style="margin-top:var(--space-3);">
+      <h3 data-en="💡 Why Water Matters">💡 Kenapa Air Penting?</h3>
+      <p data-en="Water helps regulate body temperature, lubricate joints, transport nutrients, and maintain brain function and energy throughout the day. Even mild dehydration can affect focus and mood.">Air membantu kekalkan suhu badan, lincinkan sendi, angkut nutrien, dan kekalkan fungsi otak &amp; tenaga sepanjang hari. Kekurangan air walau sedikit boleh jejaskan fokus dan mood.</p>
+    </div>
+
+    <div class="card" style="margin-top:var(--space-3);">
+      <h3 data-en="📝 Feedback">📝 Maklum Balas</h3>
+      <form class="stack" onsubmit="return handleFeedback(event)">
+        <div class="field">
+          <label for="feedback" data-en="Have a suggestion or issue?">Ada cadangan atau masalah?</label>
+          <input type="text" id="feedback" placeholder="Taip di sini..." />
+        </div>
+        <button type="submit" class="btn" data-en="Send">Hantar</button>
+      </form>
+      <p id="feedback-thanks" style="display:none; color:var(--color-success);" data-en="Thanks for your feedback!">Terima kasih atas maklum balas kau!</p>
+    </div>
+
+    <nav class="tab-bar">
+      <a href="dashboard.html"><span class="icon">🏠</span><span data-en="Dashboard">Dashboard</span></a>
+      <a href="drink-history.html"><span class="icon">📋</span><span data-en="History">Sejarah</span></a>
+      <a href="weekly-chart.html"><span class="icon">📊</span><span data-en="Stats">Statistik</span></a>
+      <a href="achievements.html"><span class="icon">🏆</span><span data-en="Badges">Lencana</span></a>
+      <a href="settings.html" class="active"><span class="icon">⚙️</span><span data-en="Settings">Tetapan</span></a>
+    </nav>
+  </main>
+
+  <script>
+    function handleFeedback(event) {
+      event.preventDefault();
+      document.getElementById("feedback-thanks").style.display = "block";
+      document.getElementById("feedback").value = "";
+      return false;
+    }
+  </script>
+  <script src="../js/i18n.js"></script>
+</body>
+</html>

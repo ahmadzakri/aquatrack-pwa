@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AquaTrack — Log Masuk</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <main class="screen">
+    <h1 data-en="Log In">Log Masuk</h1>
+    <p data-en="Continue your hydration journey.">Sambung semula journey hidrasi kau.</p>
+
+    <form class="stack" style="margin-top:var(--space-4);" onsubmit="return handleLogin(event)">
+      <div class="field">
+        <label for="email" data-en="Email">Email</label>
+        <input type="email" id="email" required placeholder="nama@email.com" />
+      </div>
+      <div class="field">
+        <label for="password" data-en="Password">Kata Laluan</label>
+        <input type="password" id="password" required placeholder="••••••••" />
+      </div>
+      <p id="error-msg" style="color:#EB5757; display:none;"></p>
+      <button type="submit" class="btn" data-en="Log In">Log Masuk</button>
+    </form>
+
+    <p style="text-align:center; margin-top:var(--space-4);">
+      <span data-en="No account yet?">Tiada akaun?</span> <a href="signup.html" class="top-link" data-en="Sign Up">Daftar</a>
+    </p>
+  </main>
+
+  <script src="https://unpkg.com/dexie@4/dist/dexie.js"></script>
+  <script src="../js/db.js"></script>
+  <script type="module">
+    import { auth } from "../js/firebase-config.js";
+    import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+
+    window.handleLogin = async function (event) {
+      event.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const errorMsg = document.getElementById("error-msg");
+      const lang = localStorage.getItem("aquatrack_lang") || "ms";
+
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const uid = userCredential.user.uid;
+
+        // Find this account's locally-cached profile (name, goal, etc.)
+        let localProfile = await db.userProfile.where("firebaseUid").equals(uid).first();
+
+        if (!localProfile) {
+          // Account exists in Firebase but not on this device/browser yet
+          // (e.g. first login on a new device). Create a stub profile —
+          // the user will need to redo Profile Setup here, since weight/
+          // goal data lives locally in Dexie, not synced via Firestore.
+          const newLocalId = await db.userProfile.add({ email, firebaseUid: uid });
+          localStorage.setItem("aquatrack_loggedInUserId", newLocalId);
+          window.location.href = "profile-setup.html";
+          return false;
+        }
+
+        localStorage.setItem("aquatrack_loggedInUserId", localProfile.id);
+        window.location.href = "dashboard.html";
+      } catch (error) {
+        errorMsg.textContent = lang === "en" ? "Incorrect email or password." : "Email atau kata laluan salah.";
+        errorMsg.style.display = "block";
+      }
+      return false;
+    };
+  </script>
+  <script src="../js/i18n.js"></script>
+</body>
+</html>

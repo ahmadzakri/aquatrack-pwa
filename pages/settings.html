@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AquaTrack — Tetapan</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <main class="screen">
+    <h1 data-en="Settings">Tetapan</h1>
+
+    <div class="stack" style="margin-top:var(--space-3);">
+      <div class="card row" style="justify-content:space-between; align-items:center;">
+        <span data-en="Dark Mode">Mod Gelap</span>
+        <input type="checkbox" id="dark-mode" checked disabled title="Gelap adalah tema lalai buat masa ini" />
+      </div>
+
+      <div class="card row" style="justify-content:space-between; align-items:center;">
+        <span data-en="Unit">Unit</span>
+        <select id="unit-select" style="background:transparent; color:var(--color-text); border:none;">
+          <option value="ml">ml</option>
+          <option value="oz">oz</option>
+        </select>
+      </div>
+
+      <div class="card row" style="justify-content:space-between; align-items:center;">
+        <span data-en="Reminder Active">Reminder Aktif</span>
+        <input type="checkbox" id="reminder-toggle" checked />
+      </div>
+
+      <a href="reminder-schedule.html" class="card" data-en="Change Reminder Schedule &rarr;" style="text-decoration:none; color:var(--color-text);">
+        Ubah Jadual Reminder &rarr;
+      </a>
+      <a href="health-sync.html" class="card" data-en="Health Sync (Google Fit) &rarr;" style="text-decoration:none; color:var(--color-text);">
+        Health Sync (Google Fit) &rarr;
+      </a>
+      <a href="about.html" class="card" data-en="About / Help &rarr;" style="text-decoration:none; color:var(--color-text);">
+        Tentang / Bantuan &rarr;
+      </a>
+    </div>
+
+    <button class="btn btn-secondary" style="margin-top:var(--space-4);" onclick="handleLogout()" data-en="Log Out">Log Keluar</button>
+
+    <nav class="tab-bar">
+      <a href="dashboard.html"><span class="icon">🏠</span><span data-en="Dashboard">Dashboard</span></a>
+      <a href="drink-history.html"><span class="icon">📋</span><span data-en="History">Sejarah</span></a>
+      <a href="weekly-chart.html"><span class="icon">📊</span><span data-en="Stats">Statistik</span></a>
+      <a href="achievements.html"><span class="icon">🏆</span><span data-en="Badges">Lencana</span></a>
+      <a href="settings.html" class="active"><span class="icon">⚙️</span><span data-en="Settings">Tetapan</span></a>
+    </nav>
+  </main>
+
+  <script src="https://unpkg.com/dexie@4/dist/dexie.js"></script>
+  <script src="../js/db.js"></script>
+  <script>
+    async function loadSettings() {
+      const settings = await getSettings();
+      if (settings?.unit) document.getElementById("unit-select").value = settings.unit;
+    }
+
+    document.getElementById("unit-select").addEventListener("change", async (e) => {
+      await saveSettings({ unit: e.target.value });
+    });
+
+    function handleLogout() {
+      localStorage.removeItem("aquatrack_loggedInUserId");
+      window.location.href = "login.html";
+    }
+
+    loadSettings();
+  </script>
+  <script src="../js/i18n.js"></script>
+</body>
+</html>

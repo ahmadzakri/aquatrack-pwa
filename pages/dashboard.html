@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AquaTrack — Dashboard</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <main class="screen">
+    <div class="row" style="justify-content:space-between; align-items:center;">
+      <h1 style="margin:0;"><span data-en="Hi,">Hai,</span> <span id="user-name">👋</span></h1>
+    </div>
+
+    <div class="progress-ring-wrap">
+      <svg width="200" height="200" viewBox="0 0 200 200">
+        <defs>
+          <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#34E4C2" />
+            <stop offset="100%" stop-color="#FF9466" />
+          </linearGradient>
+        </defs>
+        <circle class="progress-ring-bg" cx="100" cy="100" r="86" />
+        <circle id="ring-fill" class="progress-ring-fill" cx="100" cy="100" r="86" />
+      </svg>
+      <div class="progress-ring-label">
+        <span class="big" id="current-ml">0ml</span>
+        <span style="color:var(--color-text-muted); font-size:0.85rem;" id="goal-ml">/ 0ml</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <a href="add-intake-quick.html" class="btn" data-en="+ Add Water" style="flex:1; text-align:center; text-decoration:none;">+ Add Water</a>
+    </div>
+
+    <div class="card" style="margin-top:var(--space-4);">
+      <p style="margin:0 0 var(--space-2); color:var(--color-text);" data-en="Recent Log">Log Terkini</p>
+      <div id="recent-logs" class="stack" style="gap:var(--space-2);"></div>
+    </div>
+
+    <nav class="tab-bar">
+      <a href="dashboard.html" class="active"><span class="icon">🏠</span><span data-en="Dashboard">Dashboard</span></a>
+      <a href="drink-history.html"><span class="icon">📋</span><span data-en="History">Sejarah</span></a>
+      <a href="weekly-chart.html"><span class="icon">📊</span><span data-en="Stats">Statistik</span></a>
+      <a href="achievements.html"><span class="icon">🏆</span><span data-en="Badges">Lencana</span></a>
+      <a href="settings.html"><span class="icon">⚙️</span><span data-en="Settings">Tetapan</span></a>
+    </nav>
+  </main>
+
+  <script src="https://unpkg.com/dexie@4/dist/dexie.js"></script>
+  <script src="../js/db.js"></script>
+  <script>
+    const RADIUS = 86;
+    const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+
+    async function loadDashboard() {
+      const userId = Number(localStorage.getItem("aquatrack_loggedInUserId"));
+      if (!userId) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      const profile = await db.userProfile.get(userId);
+      const todayLogs = await getTodayLogs();
+
+      const totalML = todayLogs.reduce((sum, log) => sum + log.amountML, 0);
+      const goalML = profile?.dailyGoalML || 2000;
+      const pct = Math.min(totalML / goalML, 1);
+
+      const lang = localStorage.getItem("aquatrack_lang") || "ms";
+
+      document.getElementById("user-name").textContent = profile?.name || (lang === "en" ? "there" : "Pengguna");
+      document.getElementById("current-ml").textContent = `${totalML}ml`;
+      document.getElementById("goal-ml").textContent = `/ ${goalML}ml`;
+
+      const ring = document.getElementById("ring-fill");
+      ring.style.strokeDasharray = CIRCUMFERENCE;
+      ring.style.strokeDashoffset = CIRCUMFERENCE * (1 - pct);
+
+      const recentContainer = document.getElementById("recent-logs");
+      const recent = todayLogs.slice(-3).reverse();
+      if (recent.length === 0) {
+        const emptyMsg = lang === "en" ? "No logs yet today." : "Belum ada log hari ini.";
+        recentContainer.innerHTML = `<p style="margin:0;">${emptyMsg}</p>`;
+      } else {
+        recentContainer.innerHTML = recent
+          .map((log) => {
+            const time = new Date(log.timestamp).toLocaleTimeString("ms-MY", { hour: "2-digit", minute: "2-digit" });
+            return `<div class="row" style="justify-content:space-between;"><span>${time}</span><span>${log.amountML}ml</span></div>`;
+          })
+          .join("");
+      }
+    }
+
+    loadDashboard();
+  </script>
+  <script src="../js/i18n.js"></script>
+</body>
+</html>

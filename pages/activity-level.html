@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AquaTrack — Tahap Aktiviti</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <main class="screen">
+    <p style="font-size:0.8rem;" data-en="Step 2 of 3">Langkah 2 dari 3</p>
+    <h1 data-en="Your Activity Level">Tahap Aktiviti Kau</h1>
+    <p data-en="The more active you are, the more water your body needs.">Lagi aktif kau, lagi banyak air badan kau perlukan.</p>
+
+    <div class="stack" style="margin-top:var(--space-4);">
+      <div class="chip" data-level="sedentari" data-multiplier="30" onclick="selectLevel(this)">
+        <strong data-en="Sedentary">Sedentari</strong>
+        <p style="margin:4px 0 0;" data-en="Desk job, little movement">Kerja duduk, sikit pergerakan</p>
+      </div>
+      <div class="chip" data-level="aktif" data-multiplier="33" onclick="selectLevel(this)">
+        <strong data-en="Active">Aktif</strong>
+        <p style="margin:4px 0 0;" data-en="Exercise 3-4 times a week">Bersenam 3-4 kali seminggu</p>
+      </div>
+      <div class="chip" data-level="sangat-aktif" data-multiplier="35" onclick="selectLevel(this)">
+        <strong data-en="Very Active">Sangat Aktif</strong>
+        <p style="margin:4px 0 0;" data-en="Exercise almost daily / physical job">Bersenam hampir setiap hari / kerja fizikal</p>
+      </div>
+    </div>
+
+    <button class="btn" style="margin-top:var(--space-4);" onclick="continueToGoal()" data-en="Next">Seterusnya</button>
+  </main>
+
+  <script src="https://unpkg.com/dexie@4/dist/dexie.js"></script>
+  <script src="../js/db.js"></script>
+  <script>
+    let selectedLevel = null;
+    let selectedMultiplier = null;
+
+    function selectLevel(el) {
+      document.querySelectorAll(".chip").forEach((c) => c.classList.remove("selected"));
+      el.classList.add("selected");
+      selectedLevel = el.dataset.level;
+      selectedMultiplier = Number(el.dataset.multiplier);
+    }
+
+    async function continueToGoal() {
+      if (!selectedLevel) {
+        alert("Sila pilih tahap aktiviti dulu.");
+        return;
+      }
+
+      const userId = Number(localStorage.getItem("aquatrack_loggedInUserId"));
+      const profile = await db.userProfile.get(userId);
+      const dailyGoalML = Math.round(profile.weightKg * selectedMultiplier);
+
+      await db.userProfile.update(userId, {
+        activityLevel: selectedLevel,
+        dailyGoalML
+      });
+
+      window.location.href = "goal-result.html";
+    }
+  </script>
+  <script src="../js/i18n.js"></script>
+</body>
+</html>

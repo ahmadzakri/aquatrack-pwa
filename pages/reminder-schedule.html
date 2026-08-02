@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AquaTrack — Jadual Reminder</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <main class="screen">
+    <h1 data-en="Set Reminder Schedule">Set Jadual Reminder</h1>
+    <p data-en="When do you want AquaTrack to remind you to drink water?">Bila kau nak AquaTrack ingatkan kau minum air?</p>
+
+    <form class="stack" style="margin-top:var(--space-4);" onsubmit="return saveAndFinish(event)">
+      <div class="row">
+        <div class="field" style="flex:1;">
+          <label for="start" data-en="Start Time">Waktu Mula</label>
+          <input type="time" id="start" value="08:00" required />
+        </div>
+        <div class="field" style="flex:1;">
+          <label for="end" data-en="End Time">Waktu Tamat</label>
+          <input type="time" id="end" value="22:00" required />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="interval" data-en="Interval (minutes)">Interval (minit)</label>
+        <select id="interval">
+          <option value="30" data-en="Every 30 minutes">Setiap 30 minit</option>
+          <option value="60" selected data-en="Every 1 hour">Setiap 1 jam</option>
+          <option value="120" data-en="Every 2 hours">Setiap 2 jam</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="notifType" data-en="Notification Type">Jenis Notifikasi</label>
+        <select id="notifType">
+          <option value="both" selected data-en="Sound + Pop-up">Bunyi + Pop-up</option>
+          <option value="sound" data-en="Sound Only">Bunyi Sahaja</option>
+          <option value="popup" data-en="Pop-up Only">Pop-up Sahaja</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn" data-en="Finish — Go to Dashboard">Selesai — Ke Dashboard</button>
+    </form>
+  </main>
+
+  <script src="https://unpkg.com/dexie@4/dist/dexie.js"></script>
+  <script src="../js/db.js"></script>
+  <script src="../js/notifications.js"></script>
+  <script>
+    async function saveAndFinish(event) {
+      event.preventDefault();
+      const reminderStart = document.getElementById("start").value;
+      const reminderEnd = document.getElementById("end").value;
+      const intervalMinutes = Number(document.getElementById("interval").value);
+      const notifType = document.getElementById("notifType").value;
+
+      await saveSettings({ reminderStart, reminderEnd, intervalMinutes, notifType, theme: "dark", unit: "ml" });
+
+      // Ask for notification permission now, while the user is engaged.
+      await requestNotificationPermission();
+
+      window.location.href = "dashboard.html";
+      return false;
+    }
+  </script>
+  <script src="../js/i18n.js"></script>
+</body>
+</html>

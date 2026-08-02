@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AquaTrack — Lencana</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <main class="screen">
+    <h1 data-en="Achievements">Pencapaian</h1>
+    <p id="streak-summary">🔥 Streak: — hari</p>
+
+    <div class="badge-grid" id="badge-grid" style="margin-top:var(--space-3);"></div>
+
+    <a href="leaderboard.html" class="btn btn-secondary" data-en="View Leaderboard" style="text-decoration:none; text-align:center; margin-top:var(--space-4);">
+      Lihat Leaderboard
+    </a>
+
+    <nav class="tab-bar">
+      <a href="dashboard.html"><span class="icon">🏠</span><span data-en="Dashboard">Dashboard</span></a>
+      <a href="drink-history.html"><span class="icon">📋</span><span data-en="History">Sejarah</span></a>
+      <a href="weekly-chart.html"><span class="icon">📊</span><span data-en="Stats">Statistik</span></a>
+      <a href="achievements.html" class="active"><span class="icon">🏆</span><span data-en="Badges">Lencana</span></a>
+      <a href="settings.html"><span class="icon">⚙️</span><span data-en="Settings">Tetapan</span></a>
+    </nav>
+  </main>
+
+  <script src="https://unpkg.com/dexie@4/dist/dexie.js"></script>
+  <script src="../js/db.js"></script>
+  <script>
+    const BADGES = [
+      { id: "first-sip", label: "Teguk Pertama", labelEn: "First Sip", emoji: "💧", threshold: 1 },
+      { id: "streak-3", label: "Streak 3 Hari", labelEn: "3-Day Streak", emoji: "🔥", threshold: 3 },
+      { id: "streak-7", label: "Streak 7 Hari", labelEn: "7-Day Streak", emoji: "⭐", threshold: 7 },
+      { id: "streak-14", label: "Streak 14 Hari", labelEn: "14-Day Streak", emoji: "🏅", threshold: 14 },
+      { id: "streak-30", label: "Streak 30 Hari", labelEn: "30-Day Streak", emoji: "👑", threshold: 30 },
+      { id: "hydration-hero", label: "Hydration Hero", labelEn: "Hydration Hero", emoji: "🦸", threshold: 50 }
+    ];
+
+    async function calculateStreak() {
+      const userId = Number(localStorage.getItem("aquatrack_loggedInUserId"));
+      const profile = await db.userProfile.get(userId);
+      const goalML = profile?.dailyGoalML || 2000;
+      const allLogs = await db.drinkLogs.toArray();
+
+      // Group logs by day, then count consecutive days (from today backwards)
+      // where the total met the goal.
+      const totalsByDay = {};
+      allLogs.forEach((log) => {
+        const day = new Date(log.timestamp);
+        day.setHours(0, 0, 0, 0);
+        const key = day.getTime();
+        totalsByDay[key] = (totalsByDay[key] || 0) + log.amountML;
+      });
+
+      let streak = 0;
+      let cursor = new Date();
+      cursor.setHours(0, 0, 0, 0);
+
+      while (true) {
+        const total = totalsByDay[cursor.getTime()] || 0;
+        if (total >= goalML) {
+          streak++;
+          cursor.setDate(cursor.getDate() - 1);
+        } else {
+          break;
+        }
+      }
+
+      return { streak, totalLogsCount: allLogs.length };
+    }
+
+    async function loadAchievements() {
+      const { streak, totalLogsCount } = await calculateStreak();
+      const lang = localStorage.getItem("aquatrack_lang") || "ms";
+      document.getElementById("streak-summary").textContent =
+        lang === "en" ? `🔥 Streak: ${streak} days` : `🔥 Streak: ${streak} hari`;
+
+      const gridEl = document.getElementById("badge-grid");
+      gridEl.innerHTML = BADGES.map((badge) => {
+        const progressValue = badge.id === "first-sip" ? totalLogsCount : streak;
+        const unlocked = progressValue >= badge.threshold;
+        const label = lang === "en" ? badge.labelEn : badge.label;
+        return `
+          <div class="badge ${unlocked ? "unlocked" : ""}">
+            <div style="font-size:1.8rem;">${badge.emoji}</div>
+            <p style="margin:4px 0 0; font-size:0.8rem;">${label}</p>
+          </div>`;
+      }).join("");
+    }
+
+    loadAchievements();
+  </script>
+  <script src="../js/i18n.js"></script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AquaTrack — Statistik Mingguan</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <main class="screen">
+    <h1 data-en="Weekly Statistics">Statistik Mingguan</h1>
+    <div class="row" style="gap:var(--space-2); margin-bottom:var(--space-3);">
+      <a href="weekly-chart.html" class="chip selected" data-en="Week" style="text-decoration:none; color:inherit;">Minggu</a>
+      <a href="monthly-chart.html" class="chip" data-en="Month" style="text-decoration:none; color:inherit;">Bulan</a>
+    </div>
+
+    <div class="card">
+      <canvas id="weeklyCanvas" height="220"></canvas>
+    </div>
+
+    <nav class="tab-bar">
+      <a href="dashboard.html"><span class="icon">🏠</span><span data-en="Dashboard">Dashboard</span></a>
+      <a href="drink-history.html"><span class="icon">📋</span><span data-en="History">Sejarah</span></a>
+      <a href="weekly-chart.html" class="active"><span class="icon">📊</span><span data-en="Stats">Statistik</span></a>
+      <a href="achievements.html"><span class="icon">🏆</span><span data-en="Badges">Lencana</span></a>
+      <a href="settings.html"><span class="icon">⚙️</span><span data-en="Settings">Tetapan</span></a>
+    </nav>
+  </main>
+
+  <script src="https://unpkg.com/dexie@4/dist/dexie.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="../js/db.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    async function loadWeeklyChart() {
+      const userId = Number(localStorage.getItem("aquatrack_loggedInUserId"));
+      const profile = await db.userProfile.get(userId);
+      const goalML = profile?.dailyGoalML || 2000;
+
+      // Bucket the last 7 days of logs into daily totals (Mon-Sun order).
+      const now = new Date();
+      const startOfWeek = new Date(now);
+      startOfWeek.setDate(now.getDate() - ((now.getDay() + 6) % 7)); // Monday
+      startOfWeek.setHours(0, 0, 0, 0);
+
+      const allLogs = await db.drinkLogs.toArray();
+      const dailyTotals = new Array(7).fill(0);
+
+      allLogs.forEach((log) => {
+        const dayIndex = Math.floor((log.timestamp - startOfWeek.getTime()) / 86400000);
+        if (dayIndex >= 0 && dayIndex < 7) {
+          dailyTotals[dayIndex] += log.amountML;
+        }
+      });
+
+      renderWeeklyChart("weeklyCanvas", dailyTotals, goalML);
+    }
+
+    loadWeeklyChart();
+  </script>
+  <script src="../js/i18n.js"></script>
+</body>
+</html>

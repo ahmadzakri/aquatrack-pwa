@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AquaTrack — Sejarah Hari Ini</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <main class="screen">
+    <h1 data-en="Today's History">Sejarah Hari Ini</h1>
+    <p id="total-summary"></p>
+
+    <div id="log-list" class="stack" style="margin-top:var(--space-3);"></div>
+
+    <nav class="tab-bar">
+      <a href="dashboard.html"><span class="icon">🏠</span><span data-en="Dashboard">Dashboard</span></a>
+      <a href="drink-history.html" class="active"><span class="icon">📋</span><span data-en="History">Sejarah</span></a>
+      <a href="weekly-chart.html"><span class="icon">📊</span><span data-en="Stats">Statistik</span></a>
+      <a href="achievements.html"><span class="icon">🏆</span><span data-en="Badges">Lencana</span></a>
+      <a href="settings.html"><span class="icon">⚙️</span><span data-en="Settings">Tetapan</span></a>
+    </nav>
+  </main>
+
+  <script src="https://unpkg.com/dexie@4/dist/dexie.js"></script>
+  <script src="../js/db.js"></script>
+  <script>
+    async function loadHistory() {
+      const logs = (await getTodayLogs()).sort((a, b) => b.timestamp - a.timestamp);
+      const total = logs.reduce((sum, l) => sum + l.amountML, 0);
+      const lang = localStorage.getItem("aquatrack_lang") || "ms";
+
+      document.getElementById("total-summary").textContent =
+        lang === "en"
+          ? `Total today: ${total}ml (${logs.length} logs)`
+          : `Jumlah hari ini: ${total}ml (${logs.length} log)`;
+
+      const listEl = document.getElementById("log-list");
+      if (logs.length === 0) {
+        const emptyMsg =
+          lang === "en"
+            ? "No water logged today yet. Go to Dashboard to add some."
+            : "Belum ada log air hari ini. Pergi Dashboard untuk tambah.";
+        listEl.innerHTML = `<p>${emptyMsg}</p>`;
+        return;
+      }
+
+      listEl.innerHTML = logs
+        .map((log) => {
+          const time = new Date(log.timestamp).toLocaleTimeString("ms-MY", { hour: "2-digit", minute: "2-digit" });
+          return `
+            <div class="card row" style="justify-content:space-between; align-items:center; padding:var(--space-3);">
+              <span>💧 ${time}</span>
+              <strong>${log.amountML}ml</strong>
+            </div>`;
+        })
+        .join("");
+    }
+
+    loadHistory();
+  </script>
+  <script src="../js/i18n.js"></script>
+</body>
+</html>

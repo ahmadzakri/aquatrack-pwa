@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AquaTrack — Jumlah Sendiri</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <main class="screen">
+    <a href="add-intake-quick.html" class="top-link" data-en="&larr; Back">&larr; Kembali</a>
+    <h1 style="margin-top:var(--space-3);" data-en="Enter Amount">Masukkan Jumlah</h1>
+    <p data-en="How many ml of water did you drink?">Berapa ml air yang kau minum?</p>
+
+    <form class="stack" style="margin-top:var(--space-4);" onsubmit="return handleCustomAdd(event)">
+      <div class="field">
+        <label for="amount" data-en="Amount (ml)">Jumlah (ml)</label>
+        <input type="number" id="amount" required min="1" max="3000" placeholder="cth: 350" autofocus />
+      </div>
+      <button type="submit" class="btn" data-en="Add">Tambah</button>
+    </form>
+  </main>
+
+  <script src="https://unpkg.com/dexie@4/dist/dexie.js"></script>
+  <script src="../js/db.js"></script>
+  <script>
+    async function handleCustomAdd(event) {
+      event.preventDefault();
+      const amountML = Number(document.getElementById("amount").value);
+      await addDrinkLog(amountML);
+      window.location.href = "dashboard.html";
+      return false;
+    }
+  </script>
+  <script src="../js/i18n.js"></script>
+</body>
+</html>
